@@ -67,7 +67,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   poetry config virtualenvs.in-project true
 
   # Install Homebrew casks
-  brew tap homebrew/cask-fonts
+  #brew tap homebrew/cask-fonts
   echo "Installing Homebrew casks: ${BREW_CASKS[*]}"
   brew install --cask "${BREW_CASKS[@]}"
 

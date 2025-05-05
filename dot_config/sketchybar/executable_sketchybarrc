@@ -49,7 +49,7 @@ sketchybar --add bracket spaces '/space\..*/' \
 		background.corner_radius=4 \
 		background.height=24 \
 		background.border_width=1 \
-		background.border_color=$CHA_COLOR_YELLOW3
+		background.border_color=$CHA_COLOR_PURPLE1
 
 # Clock
 sketchybar --add item clock right \
@@ -58,7 +58,7 @@ sketchybar --add item clock right \
 		background.corner_radius=4 \
 		background.height=24 \
 		background.border_width=1 \
-		background.border_color=$CHA_COLOR_YELLOW3 \
+		background.border_color=$CHA_COLOR_PURPLE1 \
 		label.padding_left=8 \
 		label.padding_right=8 \
 		update_freq=10 \
@@ -80,7 +80,7 @@ sketchybar --add item disk.label right \
 		label="DISK:" \
 		label.padding_left=8 \
     label.padding_right=4 \
-		label.color=$CHA_COLOR_YELLOW3
+		label.color=$CHA_COLOR_PURPLE1
 
 sketchybar --add bracket disk disk.number disk.label \
 	--set disk \
@@ -88,7 +88,7 @@ sketchybar --add bracket disk disk.number disk.label \
 		background.corner_radius=4 \
 		background.height=24 \
 		background.border_width=1 \
-		background.border_color=$CHA_COLOR_YELLOW3 \
+		background.border_color=$CHA_COLOR_PURPLE1 \
 		padding_left=8
 
 # Spacer 2
@@ -107,7 +107,7 @@ sketchybar --add item ram.label right \
 		label="RAM:" \
 		label.padding_left=8 \
     label.padding_right=4 \
-		label.color=$CHA_COLOR_YELLOW3
+		label.color=$CHA_COLOR_PURPLE1
 
 sketchybar --add bracket ram ram.number ram.label \
 	--set ram \
@@ -115,7 +115,7 @@ sketchybar --add bracket ram ram.number ram.label \
 		background.corner_radius=4 \
 		background.height=24 \
 		background.border_width=1 \
-		background.border_color=$CHA_COLOR_YELLOW3 \
+		background.border_color=$CHA_COLOR_PURPLE1 \
 		padding_left=8
 
 # Spacer 3
@@ -134,7 +134,7 @@ sketchybar --add item cpu.label right \
 		label="CPU:" \
 		label.padding_left=8 \
     label.padding_right=4 \
-		label.color=$CHA_COLOR_YELLOW3
+		label.color=$CHA_COLOR_PURPLE1
 
 sketchybar --add bracket cpu cpu.number cpu.label \
 	--set cpu \
@@ -142,7 +142,7 @@ sketchybar --add bracket cpu cpu.number cpu.label \
 		background.corner_radius=4 \
 		background.height=24 \
 		background.border_width=1 \
-		background.border_color=$CHA_COLOR_YELLOW3 \
+		background.border_color=$CHA_COLOR_PURPLE1 \
 		padding_left=8
 
 # Force all scripts to run the first time (never do this in a script)

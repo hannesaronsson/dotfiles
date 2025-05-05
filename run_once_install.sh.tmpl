@@ -62,7 +62,14 @@ if [[ "$(uname)" == "Darwin" ]]; then
 
   # Install Homebrew packages
   echo "Installing Homebrew packages: ${BREW_PACKAGES[*]}"
-  brew install "${BREW_PACKAGES[@]}"
+  for package in "${BREW_PACKAGES[@]}"; do
+    if ! brew list | grep -q "^${package}\$"; then
+      echo "Installing $package..."
+      brew install "$package"
+    else
+      echo "✅ $package is already installed, skipping."
+    fi
+  done
 
   # Configure Poetry
   echo "Configuring Poetry virtualenvs location..."
@@ -71,7 +78,19 @@ if [[ "$(uname)" == "Darwin" ]]; then
   # Install Homebrew casks
   #brew tap homebrew/cask-fonts
   echo "Installing Homebrew casks: ${BREW_CASKS[*]}"
-  brew install --cask "${BREW_CASKS[@]}"
+  for cask in "${BREW_CASKS[@]}"; do
+    if [[ "$cask" == "font-fira-code-nerd-font" ]] && [[ -f "$HOME/Library/Fonts/FiraCodeNerdFont-Bold.ttf" ]]; then
+      echo "✅ Font $cask already exists at ~/Library/Fonts, skipping."
+      continue
+    fi
+
+    if ! brew list --cask | grep -q "^${cask}\$"; then
+      echo "Installing $cask..."
+      brew install --cask "$cask"
+    else
+      echo "✅ $cask is already installed, skipping."
+    fi
+  done
 
   # Start Colima service
   echo "Starting Colima service..."
@@ -88,6 +107,8 @@ if [[ "$(uname)" == "Darwin" ]]; then
   if ! command -v aerospace >/dev/null 2>&1; then
     echo "Installing aerospace..."
     brew install "${AEROSPACE_OPTIONS[@]}"
+  else
+    echo "✅ Aerospace is already installed, skipping."
   fi
 else
   echo "This script currently only supports macOS."

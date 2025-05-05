@@ -36,8 +36,10 @@ if [[ "$(uname)" == "Darwin" ]]; then
   fi
 
   # Disable press-and-hold for key repeat
-  echo "Disabling press-and-hold for key repeat..."
+  echo "Disabling press-and-hold for key repeat and changing other defaults..."
   defaults write -g ApplePressAndHoldEnabled -bool false
+  defaults write -g NSWindowShouldDragOnGesture -bool true
+
 
   # Install custom US no-dead-key keyboard layout if present
   LAYOUT_SRC="keyboard-layouts/us_no_dead_key.keylayout"

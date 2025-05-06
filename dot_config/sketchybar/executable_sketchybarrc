@@ -144,6 +144,8 @@ sketchybar --add bracket cpu cpu.number cpu.label \
 		background.border_width=1 \
 		background.border_color=$CHA_COLOR_PURPLE1 \
 		padding_left=8
+		
+
 
 # Force all scripts to run the first time (never do this in a script)
 sketchybar --update

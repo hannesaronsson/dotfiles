@@ -110,3 +110,10 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+#
+#
+#
+# Jira CLI completion
+
+export JIRA_API_TOKEN=$(keepassxc-cli show -q --no-password -k ~/key.keyx -a Password ~/Passwords.kdbx jira-cli)
+

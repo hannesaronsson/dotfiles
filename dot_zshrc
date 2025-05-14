@@ -77,7 +77,6 @@ plugins=(
   z                 # Quick directory jumping
   zsh-autosuggestions  # Suggest commands as you type
   zsh-syntax-highlighting  # Colorizes your commands
-  zsh-autocomplete
   fzf               # Fuzzy search through history/files
   alias-finder      # Suggests aliases for frequently used commands
 )

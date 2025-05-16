@@ -1,6 +1,6 @@
 require("nvchad.configs.lspconfig").defaults()
 
-local servers = { "html", "cssls", "ruff", "pyright"}
+local servers = { "html", "cssls", "ruff", "pyright", 'render-markdown'}
 vim.lsp.enable(servers)
 
 -- read :h vim.lsp.config for changing options of lsp servers 
@@ -21,4 +21,8 @@ vim.lsp.config['pyright'] = {
       },
     },
   },
+}
+
+vim.lsp.config['render-markdown'] = {
+  file_types = {'markdown'}
 }

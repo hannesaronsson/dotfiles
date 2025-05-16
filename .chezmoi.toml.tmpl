@@ -1,4 +1,20 @@
-{{- $email := promptStringOnce . "email" "Email address" -}}
+{{- $work_profile := list "work" "private"}}
+{{- $extras_profile_choices := list "media" }}
+
+
+{{- $email := promptStringOnce . "email" "What is your email address" -}}
+
+{{- $profile := promptChoiceOnce . "profile" "What profile are you setting up?"
+    $work_profile -}}
+{{- $extras_profile := promptMultichoiceOnce . "extras" "What extras do you need?"
+    $extras_profile_choices -}}
+
+{{- $path_to_keepass_db := promptStringOnce . "path_to_keepass_db" "Path to keepassxc database"}}
 
 [data]
     email = {{ $email | quote }}
+    profile = {{ $profile | quote }}
+    extras = {{ $extras_profile | toToml }}
+
+[keepassxc]
+    database = {{ $path_to_keepass_db | quote }}

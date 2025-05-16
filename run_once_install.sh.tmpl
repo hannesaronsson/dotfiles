@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # This script is managed by chezmoi and will be run once on initialization
 
-set -e
+set -euo pipefail
+msg() { printf "\e[32m\u25b6 %s\e[0m\n" "$*"; }
 
+{{- if eq .chezmoi.os "darwin" }}
 # Editable lists of Homebrew packages, casks, and Aerospace options
 BREW_PACKAGES=(
   stow
@@ -99,11 +101,6 @@ if [[ "$(uname)" == "Darwin" ]]; then
   brew services start colima
   colima start
 
-  # Install oh-my-zsh if missing
-  if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
-    echo "Installing oh-my-zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-  fi
 
   # Install aerospace if missing
   if ! command -v aerospace >/dev/null 2>&1; then
@@ -116,4 +113,67 @@ else
   echo "This script currently only supports macOS."
 fi
 
-echo "One-time setup complete!"
+{{- else if eq .chezmoi.os "linux" }}
+
+
+# 1.  Packages you actually used (from shell history)
+PACMAN_PKGS=(
+  # shells & basics
+  zsh git curl wget base-devel fzf htop tree neovim # dev & python
+  python python-pip keepassxc                                       # keepass secret
+  gh github-cli                                                     # GitHub CLI
+  # container / infra
+  docker docker-compose podman podman-compose                       # media-stack work 
+  firewalld                                                         # firewall tweaks
+  wireguard-tools                                                   # wg-quick confs
+  mullvad-vpn                                                       # CLI VPN 
+  # multimedia / audio
+  pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber   # audio stack
+  gst-plugin-pipewire helvum easyeffects pavucontrol
+  # fonts & desktop
+  ttf-firacode-nerd                                                 # nerd font for Alacritty
+  wl-copy wayclip                                                   # clipboard helpers
+  bluez bluez-utils                                                 # Bluetooth
+  mesa libva-mesa-driver libva-utils vulkan-radeon lib32-vulkan-radeon vulkan-tools  # GPU
+  ntfs-3g                                                           # media disk mounts # gaming / input
+  steam game-devices-udev evtest                                    # Steam & controller tweaks
+)
+
+
+msg "Updating pacman & installing packages\u2026"
+sudo pacman -Syu --noconfirm
+sudo pacman -S --needed --noconfirm "${PACMAN_PKGS}"
+
+  # AUR helper (yay) for visual-studio-code-bin, mullvad-vpn-bin, nerd fonts, etc.
+  if ! command -v yay &>/dev/null; then
+    git clone --depth 1 https://aur.archlinux.org/yay.git /tmp/yay
+    (cd /tmp/yay && makepkg -si --noconfirm); rm -rf /tmp/yay
+  fi
+  #yay -S --needed --noconfirm visual-studio-code-bin mullvad-vpn-bin ttf-firacode-nerd-font
+
+
+# 4.  System tweaks & service enablement
+msg "Enabling Docker & PipeWire\u2026"
+sudo systemctl enable --now docker
+systemctl --user enable --now pipewire pipewire-pulse wireplumber || true
+
+msg "Enabling Firewalld & Bluetooth\u2026"
+sudo systemctl enable --now firewalld || true
+sudo systemctl enable --now bluetooth || true
+
+# Add user to handy groups
+sudo usermod -aG docker "$USER"
+sudo usermod -aG video,render "$USER"          # VA-API & Vulkan inside containers
+
+{{- end }}
+if [[ "$SHELL" != */zsh ]]; then
+  msg "Setting default shell to zsh\u2026"; chsh -s "$(command -v zsh)"
+fi
+
+if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+  msg "Installing Oh-My-Zsh\u2026"
+  RUNZSH=no KEEP_ZSHRC=yes sh -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
+msg "\u2714 One-time bootstrap done \u2013 open a new terminal!"

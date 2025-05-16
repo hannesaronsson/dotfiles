@@ -114,6 +114,7 @@ source $ZSH/oh-my-zsh.sh
 #
 #
 #
+{{ if eq .profile "work" }}
 # Jira CLI completion
-
-export JIRA_API_TOKEN=$(keepassxc-cli show -q --no-password -k ~/key.keyx -a Password ~/Passwords.kdbx jira-cli)
+export JIRA_API_TOKEN={{ (keepassxc "jira-cli").Password }}
+{{end}}

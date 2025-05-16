@@ -1,0 +1,108 @@
+version: "3.8"
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      # Device: Daring Gnu
+      - WIREGUARD_PRIVATE_KEY={{ (keepassxc "mullvad-wireguard").Password }}
+      - WIREGUARD_ADDRESSES={{ (keepassxc "mullvad-wireguard").UserName }}
+      - SERVER_CITIES=Stockholm
+    volumes:
+      - ./gluetun:/gluetun
+    ports:
+      - "9117:9117"    # Jackett
+      - '9091:9091'    # transmission
+      - "51413:51413"     # Torrent port
+      - "51413:51413/udp"
+      - "8989:8989" #Sonarr
+      - "7878:7878" #Radarr
+      - "8096:8096" #Jellyfin
+    restart: unless-stopped
+
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    network_mode: "service:gluetun"
+    volumes:
+      - ./config/jackett:/config
+      - /mnt/media/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: "service:gluetun"
+    volumes:
+      - ./config/sonarr:/config
+      - /mnt/media/downloads:/downloads
+      - /mnt/media/Jellyfin/Shows:/tv
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr
+    container_name: radarr
+    network_mode: "service:gluetun"
+    volumes:
+      - ./config/radarr:/config
+      - /mnt/media/downloads:/downloads
+      - /mnt/media/Jellyfin/Movies:/movies
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    network_mode: "service:gluetun"
+    volumes:
+      - ./jellyfin:/config
+      - /mnt/media/Jellyfin:/media:ro
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    network_mode: "service:gluetun"
+    volumes:
+      - ./config/transmission:/config
+      - /mnt/media/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+      - USER=transuser      # Optional
+      - PASS=transpass      # Optional
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+

@@ -10,3 +10,7 @@
 media-stack/*
 {{ end }}
 
+{{ if not (has "sunshine" .extras) }}
+.config/sunshine
+{{ end }}
+

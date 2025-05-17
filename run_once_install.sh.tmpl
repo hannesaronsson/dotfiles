@@ -120,6 +120,8 @@ fi
 PACMAN_PKGS=(
   # shells & basics
   zsh git curl wget base-devel fzf htop tree neovim # dev & python
+  hypridle
+  tree
   python python-pip keepassxc                                       # keepass secret
   gh github-cli                                                     # GitHub CLI
   # container / infra
@@ -134,6 +136,7 @@ PACMAN_PKGS=(
   # fonts & desktop
   ttf-firacode-nerd                                                 # nerd font for Alacritty
   wl-copy wayclip                                                   # clipboard helpers
+  wl-clipboard
   bluez bluez-utils                                                 # Bluetooth
   mesa libva-mesa-driver libva-utils vulkan-radeon lib32-vulkan-radeon vulkan-tools  # GPU
   ntfs-3g                                                           # media disk mounts # gaming / input
@@ -166,6 +169,24 @@ sudo systemctl enable --now bluetooth || true
 sudo usermod -aG docker "$USER"
 sudo usermod -aG video,render "$USER"          # VA-API & Vulkan inside containers
 
+
+
+{{ if has "sunshine" .extras }}
+
+if ! grep -q "lizardbyte" /etc/pacman.conf; then
+  sudo tee -a /etc/pacman.conf > /dev/null <<EOF
+[lizardbyte-beta]
+SigLevel = Optional
+Server = https://github.com/LizardByte/pacman-repo/releases/download/beta
+EOF
+fi
+
+sudo pacman -Syu --noconfirm sunshine
+
+systemctl --user enable --now sunshine.service
+
+{{ end }}
+
 {{- end }}
 if [[ "$SHELL" != */zsh ]]; then
   msg "Setting default shell to zsh\u2026"; chsh -s "$(command -v zsh)"
@@ -176,5 +197,7 @@ if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   RUNZSH=no KEEP_ZSHRC=yes sh -c \
     "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
+
+
 
 msg "\u2714 One-time bootstrap done \u2013 open a new terminal!"

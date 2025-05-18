@@ -64,7 +64,13 @@ return {
   config = function(_, opts)
     require("render-markdown").setup(opts)
   end,
-}
+},
+--   {
+--    "m4xshen/hardtime.nvim",
+--    lazy = false,
+--    dependencies = { "MunifTanjim/nui.nvim" },
+--    opts = {},
+-- },
 
   -- test new blink
   -- { import = "nvchad.blink.lazyspec" },

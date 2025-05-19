@@ -14,3 +14,7 @@ media-stack/*
 .config/sunshine
 {{ end }}
 
+{{ if not (has "artisan" .extras) }}
+.config/artisan-scope
+{{ end }}
+

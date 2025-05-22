@@ -12,6 +12,7 @@ media-stack/*
 
 {{ if not (has "sunshine" .extras) }}
 .config/sunshine
+.config/systemd/user/sunshine.service
 {{ end }}
 
 {{ if not (has "artisan" .extras) }}

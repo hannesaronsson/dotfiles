@@ -1,0 +1,13 @@
+# ~/.config/systemd/user/sunshine.service
+[Unit]
+Description=Sunshine game-streaming host
+PartOf=graphical-session.target
+After=graphical-session.target
+ConditionEnvironment=WAYLAND_DISPLAY   # only run if Wayland exists
+
+[Service]
+ExecStart=/usr/bin/sunshine
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

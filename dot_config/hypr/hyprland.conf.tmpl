@@ -24,7 +24,7 @@
 
 
 # See https://wiki.hyprland.org/Configuring/Monitors/
-monitor=DP-1,preferred,auto,auto,vrr,1
+monitor=DP-1,preferred,auto,auto,vrr,1,bitdepth,10,cm,hdr, sdrbrightness,1.5
 monitor=,preferred,auto,auto
 
 
@@ -226,8 +226,9 @@ bind = $mainMod, W, closewindow,
 bind = $mainMod, M, exit,
 bind = $mainMod, E, exec, $fileManager
 bind = $mainMod Ctrl, f, togglefloating,
+bind = $mainMod $secondMod, f, fullscreen,
 bind = $mainMod, space, exec, $menu 
-#ind = $mainMod, P, pseudo, # dwindle
+bind = $mainMod, P, pseudo, # dwindle
 bind = $mainMod, J, togglesplit, # dwindle
 
 # Move focus with mainMod + arrow keys

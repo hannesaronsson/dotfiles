@@ -157,6 +157,7 @@ sudo pacman -S --needed --noconfirm "${PACMAN_PKGS}"
   fi
   #yay -S --needed --noconfirm visual-studio-code-bin mullvad-vpn-bin ttf-firacode-nerd-font
 
+sudo loginctl enable-linger "$USER"
 
 # 4.  System tweaks & service enablement
 msg "Enabling Docker & PipeWire\u2026"

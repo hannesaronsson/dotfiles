@@ -121,6 +121,7 @@ PACMAN_PKGS=(
   # shells & basics
   zsh git curl wget base-devel fzf htop tree neovim # dev & python
   uwsm
+  hyprpolkitagent
   hypridle
   hyprlock
   tree
@@ -162,7 +163,7 @@ sudo loginctl enable-linger "$USER"
 # 4.  System tweaks & service enablement
 msg "Enabling Docker & PipeWire\u2026"
 sudo systemctl enable --now docker
-systemctl --user enable --now pipewire pipewire-pulse wireplumber || true
+systemctl --user enable --now pipewire.service pipewire-pulse.service wireplumber.service || true
 
 msg "Enabling Firewalld & Bluetooth\u2026"
 sudo systemctl enable --now firewalld || true
@@ -174,7 +175,7 @@ sudo usermod -aG video,render "$USER"          # VA-API & Vulkan inside containe
 
 
 # Hyprland services with uwsm 
-systemctl --user enable --now hypridle.service hyprpaper.service waybar.service || true
+systemctl --user enable --now hypridle.service hyprpaper.service waybar.service hyprpolkitagent.service || true
 
 
 

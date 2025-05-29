@@ -122,6 +122,7 @@ PACMAN_PKGS=(
   zsh git curl wget base-devel fzf htop tree neovim # dev & python
   uwsm
   hypridle
+  hyprlock
   tree
   python python-pip keepassxc                                       # keepass secret
   gh github-cli                                                     # GitHub CLI
@@ -169,6 +170,10 @@ sudo systemctl enable --now bluetooth || true
 # Add user to handy groups
 sudo usermod -aG docker "$USER"
 sudo usermod -aG video,render "$USER"          # VA-API & Vulkan inside containers
+
+
+# Hyprland services with uwsm 
+systemctl --user enable --now hypridle.service hyprpaper.service waybar.service || true
 
 
 

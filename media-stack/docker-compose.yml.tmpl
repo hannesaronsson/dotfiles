@@ -1,4 +1,12 @@
 version: "3.8"
+
+
+#####################  NETWORKS  #####################
+networks:
+  web:      # Public-facing network
+  internal: # For containers that talk to Jellyfin without the VPN
+
+
 services:
   gluetun:
     image: qmcgaw/gluetun
@@ -24,6 +32,21 @@ services:
       - "8096:8096" #Jellyfin
     restart: unless-stopped
 
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    networks:
+      - web
+      - internal
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    environment:
+      - TZ=Europe/Stockholm
 
   jackett:
     image: lscr.io/linuxserver/jackett:latest
@@ -75,7 +98,10 @@ services:
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
-    network_mode: "service:gluetun"
+    networks:
+      - internal
+    expose:
+      - "8096"
     volumes:
       - ./jellyfin:/config
       - /mnt/media/Jellyfin:/media:ro

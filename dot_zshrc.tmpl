@@ -122,3 +122,7 @@ source $ZSH/oh-my-zsh.sh
 # Jira CLI completion
 export JIRA_API_TOKEN={{ (keepassxc "jira-cli").Password }}
 {{end}}
+
+{{if eq .chezmoi.os "linux"}}
+export PATH="$PATH:/home/$USER/.local/bin"
+{{end}}

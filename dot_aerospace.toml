@@ -19,6 +19,7 @@ exec-on-workspace-change = [
     # '-c',
     # 'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE',
   #'exec-and-forget borders active_color=0xFFEE82EE inactive_color=0xFF696969 width=8.0'
+# 'exec-and-forget borders active_color=0xFFEE82EE inactive_color=0xFF696969 width=8.0',
 ]
 
 
@@ -48,6 +49,7 @@ default-root-container-orientation = 'auto'
 # See https://nikitabobko.github.io/AeroSpace/commands#move-mouse
 # Fallback value (if you omit the key): on-focused-monitor-changed = []
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+on-focus-changed = ['move-mouse window-lazy-center'] # Mouse lazily follows any focus (window or workspace)
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
@@ -120,6 +122,7 @@ cmd-slash = 'layout tiles horizontal vertical'
 cmd-comma = 'layout accordion horizontal vertical'
 
 cmd-ctrl-f = 'layout floating tiling'
+cmd-alt-f = 'macos-native-fullscreen'
 
 cmd-shift-left = 'join-with left'
 cmd-shift-down = 'join-with down'

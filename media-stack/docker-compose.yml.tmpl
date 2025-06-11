@@ -47,6 +47,7 @@ services:
       - ./caddy/config:/config
     environment:
       - TZ=Europe/Stockholm
+    restart: unless-stopped
 
   jackett:
     image: lscr.io/linuxserver/jackett:latest

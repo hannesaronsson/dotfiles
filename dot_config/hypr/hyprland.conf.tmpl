@@ -89,7 +89,7 @@ env = HYPRCURSOR_SIZE,24
 # https://wiki.hyprland.org/Configuring/Variables/#general
 general {
     gaps_in = 5
-    gaps_out = 10
+    gaps_out = 3 
 
     border_size = 2
 
@@ -250,6 +250,9 @@ bind = $mainMod, space, exec, $menu
 bind = $mainMod, P, pseudo, # dwindle
 bind = $mainMod, J, togglesplit, # dwindle
 
+
+bind = $mainMod Alt, h, exec, pkill -USR1 waybar
+
 # Move focus with mainMod + arrow keys
 # bind = $mainMod, left, movefocus, l
 # bind = $mainMod, right, movefocus, r
@@ -328,6 +331,9 @@ bindl = , XF86AudioPrev, exec, playerctl previous
 
 bind = $mainMod, equal, resizeactive, 20 20
 bind = $mainMod, minus, resizeactive, -20 -20
+
+bind = $mainMod, comma, exec, hyprctl keyword general:layout "dwindle"
+bind = $mainMod, slash, exec, hyprctl keyword general:layout "master"
 
 ##############################
 ### WINDOWS AND WORKSPACES ###

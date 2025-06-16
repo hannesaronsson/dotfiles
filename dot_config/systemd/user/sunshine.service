@@ -5,7 +5,7 @@ PartOf=graphical-session.target
 After=graphical-session.target
 
 [Service]
-ExecStartPre=%h/.config/sunshine/create_screen.sh
+#ExecStartPre=%h/.config/sunshine/create_screen.sh
 ExecStart=/usr/bin/sunshine
 Restart=on-failure
 

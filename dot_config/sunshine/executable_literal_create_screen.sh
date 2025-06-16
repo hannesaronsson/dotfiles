@@ -5,6 +5,12 @@ HEIGHT=${2:-1080}
 REFRESH=${3:-60}
 HDR=${4:-false}
 
+
+if hyprctl -j monitors | grep -q '"name":"STREAM"'; then
+  # nothing to do
+  exit 0
+fi
+
 # Create headless and capture its name
 hyprctl output create headless STREAM
 sleep 0.3

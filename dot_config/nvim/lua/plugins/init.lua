@@ -65,6 +65,11 @@ return {
     require("render-markdown").setup(opts)
   end,
 },
+{
+  "github/copilot.vim",
+  event = "InsertEnter", -- lazy load on first insert
+}
+  ,
 --   {
 --    "m4xshen/hardtime.nvim",
 --    lazy = false,

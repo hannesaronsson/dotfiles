@@ -92,6 +92,8 @@ return {
 					["if"] = "@function.inner",
 					["al"] = "@loop.outer",
 					["il"] = "@loop.inner",
+					["ab"] = "@block.outer",
+					["ib"] = "@block.inner",
 				},
 			}
 

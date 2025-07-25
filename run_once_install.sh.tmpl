@@ -10,10 +10,9 @@ BREW_PACKAGES=(
   stow
   neovim
   alacritty
+  zoxide
   borders
   pyenv
-  colima
-  docker
   fzf
   htop
   tree
@@ -96,10 +95,6 @@ if [[ "$(uname)" == "Darwin" ]]; then
     fi
   done
 
-  # Start Colima service
-  echo "Starting Colima service..."
-  brew services start colima
-  colima start
 
 
   # Install aerospace if missing

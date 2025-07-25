@@ -78,7 +78,7 @@ plugins=(
   # vi-mode #vim motions for terminal
   zsh-vi-mode
   git               # Git aliases and helpers
-  z                 # Quick directory jumping
+  # z                 # Quick directory jumping
   zsh-autosuggestions  # Suggest commands as you type
   zsh-syntax-highlighting  # Colorizes your commands
   fzf               # Fuzzy search through history/files
@@ -127,3 +127,6 @@ export JIRA_API_TOKEN={{ (keepassxc "jira-cli").Password }}
 export PATH="$PATH:/home/$USER/.local/bin"
 alias win11="sudo systemctl reboot --boot-loader-entry=auto-windows --boot-loader-menu=0"
 {{end}}
+
+
+eval "$(zoxide init zsh)"

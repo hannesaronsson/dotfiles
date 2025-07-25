@@ -78,23 +78,40 @@ return {
 		"github/copilot.vim",
 		event = "InsertEnter", -- lazy load on first insert
 	},
-	--   {
-	--    "m4xshen/hardtime.nvim",
-	--    lazy = false,
-	--    dependencies = { "MunifTanjim/nui.nvim" },
-	--    opts = {},
-	-- },
 
-	-- test new blink
-	-- { import = "nvchad.blink.lazyspec" },
+	{
+		"nvim-treesitter/nvim-treesitter",
+		opts = function(_, opts)
+			opts.textobjects = opts.textobjects or {}
 
-	-- {
-	-- 	"nvim-treesitter/nvim-treesitter",
-	-- 	opts = {
-	-- 		ensure_installed = {
-	-- 			"vim", "lua", "vimdoc",
-	--      "html", "css"
-	-- 		},
-	-- 	},
-	-- },
+			opts.textobjects.select = {
+				enable = true,
+				lookahead = true,
+				keymaps = {
+					["af"] = "@function.outer",
+					["if"] = "@function.inner",
+					["al"] = "@loop.outer",
+					["il"] = "@loop.inner",
+				},
+			}
+
+			opts.textobjects.move = {
+				enable = true,
+				set_jumps = true,
+				goto_next_start = {
+					["]f"] = "@function.outer",
+					["]l"] = "@loop.outer",
+				},
+				goto_previous_start = {
+					["[f"] = "@function.outer",
+					["[l"] = "@loop.outer",
+				},
+			}
+		end,
+	},
+	{
+		"nvim-treesitter/nvim-treesitter-textobjects",
+		dependencies = { "nvim-treesitter" },
+		event = "VeryLazy",
+	},
 }

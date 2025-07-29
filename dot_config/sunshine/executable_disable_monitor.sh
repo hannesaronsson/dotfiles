@@ -1,4 +1,8 @@
 #!/bin/zsh
 
 
-hyprctl keyword monitor "DP-1,disable"
+NAME=${1:-DP-1}
+
+
+
+hyprctl keyword monitor "${NAME},disable"

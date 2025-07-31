@@ -1,0 +1,4 @@
+#####################  NETWORKS  #####################
+networks:
+  web:      # Public-facing network
+  internal: # For containers that talk to Jellyfin without the VPN

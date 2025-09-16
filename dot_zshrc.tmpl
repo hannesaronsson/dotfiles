@@ -125,7 +125,7 @@ export JIRA_API_TOKEN={{ (keepassxc "jira-cli").Password }}
 
 {{if eq .chezmoi.os "linux"}}
 export PATH="$PATH:/home/$USER/.local/bin"
-alias win11="sudo systemctl reboot --boot-loader-entry=auto-windows --boot-loader-menu=0"
+alias win11="sudo systemctl reboot --boot-loader-entry=auto-windows --boot-loader-menu=1"
 {{end}}
 
 

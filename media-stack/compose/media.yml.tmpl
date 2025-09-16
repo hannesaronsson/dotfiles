@@ -20,8 +20,6 @@ services:
       - "51413:51413/udp"
       - "8989:8989" #Sonarr
       - "7878:7878" #Radarr
-      - "8096:8096" #Jellyfin
-      - "5055:5055" #jellyseerr
     restart: unless-stopped
 
   caddy:
@@ -91,15 +89,18 @@ services:
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
-    network_mode: "service:gluetun"
+    networks:
+      - internal
     volumes: 
        - ../config/jellyseerr:/app/config
+    expose:
+      - "5055"
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
-    depends_on:
-      - gluetun
+    extra_hosts:
+          - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
   jellyfin:
@@ -118,8 +119,6 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
-    depends_on:
-      - gluetun
     restart: unless-stopped
 
   transmission:

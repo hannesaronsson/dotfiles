@@ -1,13 +1,23 @@
 (jellyfin_common) {
 	encode zstd gzip
-	# Pass the real visitor IP to Jellyfin’s logs
 }
 
 {{ (keepassxc "jellyfin-domain").UserName }} {
 	import jellyfin_common
 	reverse_proxy jellyfin:8096 {
-		header_down X-Real-IP        {remote_host}
-		header_down X-Forwarded-Proto https
-	}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up Host {host}
+  }
 }
 
+{{ (keepassxc "jellyseerr-domain").UserName }} {
+	import jellyfin_common
+	reverse_proxy jellyseerr:5055 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up Host {host}
+  }
+}

@@ -97,6 +97,7 @@ services:
     container_name: jellyseerr
     networks:
       - internal
+      - default
     volumes: 
        - ../config/jellyseerr:/app/config
     expose:

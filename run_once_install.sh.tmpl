@@ -2,7 +2,50 @@
 # This script is managed by chezmoi and will be run once on initialization
 
 set -euo pipefail
-msg() { printf "\e[32m\u25b6 %s\e[0m\n" "$*"; }
+set -o errtrace
+
+msg_section() { printf "\n\033[1;36m==> %s\033[0m\n" "$*"; }
+msg_info() { printf "\033[32m\u25b6 %s\033[0m\n" "$*"; }
+msg_warn() { printf "\033[33m\u26a0 %s\033[0m\n" "$*"; }
+msg_error() { printf "\033[31m\u2716 %s\033[0m\n" "$*"; }
+msg_success() { printf "\033[32m\u2714 %s\033[0m\n" "$*"; }
+msg() { msg_info "$@"; }
+
+CURRENT_STEP=""
+
+run() {
+  local description=$1
+  shift
+  CURRENT_STEP="$description"
+  msg_info "$description"
+  "$@"
+  CURRENT_STEP=""
+}
+
+run_or_warn() {
+  local description=$1
+  shift
+  CURRENT_STEP="$description"
+  msg_info "$description"
+  if ! "$@"; then
+    local exit_code=$?
+    msg_warn "$description failed (exit ${exit_code}); continuing."
+  fi
+  CURRENT_STEP=""
+}
+
+trap_err() {
+  local lineno=$1
+  local exit_code=$2
+  if [[ -n "$CURRENT_STEP" ]]; then
+    msg_error "Step '$CURRENT_STEP' failed (exit ${exit_code}) at line ${lineno}: ${BASH_COMMAND}"
+  else
+    msg_error "Command failed (exit ${exit_code}) at line ${lineno}: ${BASH_COMMAND}"
+  fi
+  exit "$exit_code"
+}
+
+trap 'trap_err $LINENO $?' ERR
 
 {{- if eq .chezmoi.os "darwin" }}
 # Editable lists of Homebrew packages, casks, and Aerospace options
@@ -114,68 +157,101 @@ fi
 # 1.  Packages you actually used (from shell history)
 PACMAN_PKGS=(
   # shells & basics
-  zsh git curl wget base-devel fzf htop tree neovim # dev & python
-  uwsm                                                              # hyprland with services
-  hyprpolkitagent hypridle hyprlock                                 # hyprland utils
-  qt5ct qt6ct kvantum kvantum breeze-icons adw-gtk-theme            # Dark mode
-  tree
-  python python-pip keepassxc                                       # keepass secret
-  gh github-cli                                                     # GitHub CLI
+  zsh git curl wget base-devel fzf htop tree neovim                  # dev & python
+  qt5ct qt6ct kvantum kvantum-qt5 breeze-icons adw-gtk-theme         # dark mode
+  python python-pip keepassxc                                        # keepass secret
+  github-cli                                                         # GitHub CLI
   # container / infra
-  docker docker-compose podman podman-compose                       # media-stack work 
-  firewalld                                                         # firewall tweaks
-  wireguard-tools                                                   # wg-quick confs
-  mullvad-vpn                                                       # CLI VPN 
+  docker docker-compose podman podman-compose                        # media-stack work
+  firewalld                                                          # firewall tweaks
+  wireguard-tools                                                    # wg-quick confs
   waybar
   # multimedia / audio
-  pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber   # audio stack
+  pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber    # audio stack
   gst-plugin-pipewire helvum easyeffects pavucontrol
   # fonts & desktop
-  ttf-firacode-nerd                                                 # nerd font for Alacritty
-  wl-copy wayclip                                                   # clipboard helpers
-  wl-clipboard
-  bluez bluez-utils                                                 # Bluetooth
+  wl-clipboard                                                       # clipboard helpers
+  xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk xdg-utils
+  bluez bluez-utils                                                  # Bluetooth
   mesa libva-mesa-driver libva-utils vulkan-radeon lib32-vulkan-radeon vulkan-tools  # GPU
-  ntfs-3g                                                           # media disk mounts # gaming / input
-  steam game-devices-udev evtest                                    # Steam & controller tweaks
+  ntfs-3g                                                            # media disk mounts # gaming / input
+  steam evtest                                                       # Steam & controller tweaks
+)
+
+AUR_PKGS=(
+  uwsm
+  hyprpolkitagent
+  hypridle
+  hyprlock
+  wayclip
+  game-devices-udev
+  ttf-firacode-nerd
+  mullvad-vpn-bin
+  visual-studio-code-bin
 )
 
 
-msg "Updating pacman & installing packages\u2026"
-sudo pacman -Syu --noconfirm
-sudo pacman -S --needed --noconfirm "${PACMAN_PKGS}"
+msg_section "Pacman packages"
+msg_info "Pacman package list: ${PACMAN_PKGS[*]}"
+run "Synchronizing pacman databases" sudo pacman -Syu --noconfirm
+run "Installing pacman packages (${#PACMAN_PKGS[@]})" sudo pacman -S --needed --noconfirm "${PACMAN_PKGS[@]}"
 
-  # AUR helper (yay) for visual-studio-code-bin, mullvad-vpn-bin, nerd fonts, etc.
+  # AUR helper (yay) for hyprland utils, fonts, etc.
+  msg_section "AUR packages"
   if ! command -v yay &>/dev/null; then
-    git clone --depth 1 https://aur.archlinux.org/yay.git /tmp/yay
-    (cd /tmp/yay && makepkg -si --noconfirm); rm -rf /tmp/yay
+    run_or_warn "Removing stale yay build directory" rm -rf /tmp/yay
+    run "Cloning yay AUR helper" git clone --depth 1 https://aur.archlinux.org/yay.git /tmp/yay
+    run "Building and installing yay" bash -c "cd /tmp/yay && makepkg -si --noconfirm"
+    run_or_warn "Cleaning up temporary yay build" rm -rf /tmp/yay
+  else
+    msg_info "yay already installed, skipping bootstrap."
   fi
-  #yay -S --needed --noconfirm visual-studio-code-bin mullvad-vpn-bin ttf-firacode-nerd-font
 
-sudo loginctl enable-linger "$USER"
+  if (( ${#AUR_PKGS[@]} )); then
+    msg_info "AUR package list: ${AUR_PKGS[*]}"
+    for aur_pkg in "${AUR_PKGS[@]}"; do
+      if yay -Qi "$aur_pkg" >/dev/null 2>&1; then
+        msg_info "✅ $aur_pkg already installed, skipping."
+        continue
+      fi
 
-# 4.  System tweaks & service enablement
-msg "Enabling Docker & PipeWire\u2026"
-sudo systemctl enable --now docker
-systemctl --user enable --now pipewire.service pipewire-pulse.service wireplumber.service || true
+      msg_info "Installing $aur_pkg via yay..."
+      if ! yay -S --needed --noconfirm --answerdiff None --answerclean None "$aur_pkg"; then
+        msg_warn "Failed to install $aur_pkg with yay; continuing."
+      fi
+    done
+  else
+    msg_info "No AUR packages requested."
+  fi
 
-msg "Enabling Firewalld & Bluetooth\u2026"
-sudo systemctl enable --now firewalld || true
-sudo systemctl enable --now bluetooth || true
+msg_section "Account configuration"
+run "Enabling lingering for $USER" sudo loginctl enable-linger "$USER"
 
-# Add user to handy groups
-sudo usermod -aG docker "$USER"
-sudo usermod -aG video,render "$USER"          # VA-API & Vulkan inside containers
+msg_section "Group membership"
+run "Adding $USER to docker group" sudo usermod -aG docker "$USER"
+run "Adding $USER to video & render groups" sudo usermod -aG video,render "$USER"
 
+msg_section "System services"
+run "Enabling Docker service" sudo systemctl enable --now docker
+run_or_warn "Enabling PipeWire user services" systemctl --user enable --now pipewire.service pipewire-pulse.service wireplumber.service
+run_or_warn "Enabling Firewalld service" sudo systemctl enable --now firewalld
+run_or_warn "Enabling Bluetooth service" sudo systemctl enable --now bluetooth
 
-# Hyprland services with uwsm 
-systemctl --user enable --now hypridle.service hyprpaper.service waybar.service hyprpolkitagent.service || true
+msg_section "Hyprland services"
+run_or_warn "Enabling Hyprland user services" systemctl --user enable --now hypridle.service hyprpaper.service waybar.service hyprpolkitagent.service
+
+msg_section "XDG desktop portal services"
+run_or_warn "Reloading user systemd daemon" systemctl --user daemon-reload
+run_or_warn "Enabling portal services" systemctl --user enable --now xdg-desktop-portal-hyprland.service xdg-desktop-portal.service
+run_or_warn "Restarting portal services" systemctl --user restart xdg-desktop-portal-hyprland.service xdg-desktop-portal.service
 
 
 
 {{ if has "sunshine" .extras }}
 
+msg_section "Sunshine streaming"
 if ! grep -q "lizardbyte" /etc/pacman.conf; then
+  msg_info "Adding LizardByte beta repository for Sunshine"
   sudo tee -a /etc/pacman.conf > /dev/null <<EOF
 [lizardbyte-beta]
 SigLevel = Optional
@@ -183,23 +259,26 @@ Server = https://github.com/LizardByte/pacman-repo/releases/download/beta
 EOF
 fi
 
-sudo pacman -Syu --noconfirm sunshine
-
-systemctl --user enable --now sunshine.service
+run "Installing Sunshine" sudo pacman -Syu --noconfirm sunshine
+run_or_warn "Enabling Sunshine user service" systemctl --user enable --now sunshine.service
 
 {{ end }}
 
 {{- end }}
+
+msg_section "Shell setup"
 if [[ "$SHELL" != */zsh ]]; then
-  msg "Setting default shell to zsh\u2026"; chsh -s "$(command -v zsh)"
+  run "Setting default shell to zsh" chsh -s "$(command -v zsh)"
+else
+  msg_info "Default shell already set to zsh."
 fi
 
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
-  msg "Installing Oh-My-Zsh\u2026"
-  RUNZSH=no KEEP_ZSHRC=yes sh -c \
-    "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  run "Installing Oh-My-Zsh" env RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+else
+  msg_info "Oh-My-Zsh already installed, skipping."
 fi
 
 
 
-msg "\u2714 One-time bootstrap done \u2013 open a new terminal!"
+msg_success "One-time bootstrap done – open a new terminal!"

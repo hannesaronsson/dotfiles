@@ -9,12 +9,18 @@
 {{- $extras_profile := promptMultichoiceOnce . "extras" "What extras do you need?"
     $extras_profile_choices -}}
 
+{{- $media_data_dir := "/mnt/media" }}
+{{- if has "media" $extras_profile }}
+{{- $media_data_dir = promptStringOnce . "media_data_dir" "Where should the media stack store data (e.g., /mnt/media)" }}
+{{- end }}
+
 {{- $path_to_keepass_db := promptStringOnce . "path_to_keepass_db" "Path to keepassxc database"}}
 
 [data]
     email = {{ $email | quote }}
     profile = {{ $profile | quote }}
     extras = {{ $extras_profile | toToml }}
+    media_data_dir = {{ $media_data_dir | quote }}
 
 [keepassxc]
     database = {{ $path_to_keepass_db | quote }}

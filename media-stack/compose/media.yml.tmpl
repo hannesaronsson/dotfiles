@@ -1,3 +1,9 @@
+{{- $mediaRoot := trimSuffix "/" (default "/mnt/media" .media_data_dir) -}}
+{{- $downloadsDir := printf "%s/downloads" $mediaRoot -}}
+{{- $jellyfinRoot := printf "%s/Jellyfin" $mediaRoot -}}
+{{- $showsDir := printf "%s/Shows" $jellyfinRoot -}}
+{{- $moviesDir := printf "%s/Movies" $jellyfinRoot -}}
+
 services:
   gluetun:
     image: qmcgaw/gluetun
@@ -45,7 +51,7 @@ services:
     network_mode: "service:gluetun"
     volumes:
       - ../config/jackett:/config
-      - /mnt/media/downloads:/downloads
+      - {{ $downloadsDir }}:/downloads
     environment:
       - PUID=1000
       - PGID=1000
@@ -60,8 +66,8 @@ services:
     network_mode: "service:gluetun"
     volumes:
       - ../config/sonarr:/config
-      - /mnt/media/downloads:/downloads
-      - /mnt/media/Jellyfin/Shows:/tv
+      - {{ $downloadsDir }}:/downloads
+      - {{ $showsDir }}:/tv
     environment:
       - PUID=1000
       - PGID=1000
@@ -76,8 +82,8 @@ services:
     network_mode: "service:gluetun"
     volumes:
       - ../config/radarr:/config
-      - /mnt/media/downloads:/downloads
-      - /mnt/media/Jellyfin/Movies:/movies
+      - {{ $downloadsDir }}:/downloads
+      - {{ $moviesDir }}:/movies
     environment:
       - PUID=1000
       - PGID=1000
@@ -112,7 +118,7 @@ services:
       - "8096"
     volumes:
       - ../jellyfin:/config
-      - /mnt/media/Jellyfin:/media:ro
+      - {{ $jellyfinRoot }}:/media:ro
     devices:
       - /dev/dri:/dev/dri
     environment:
@@ -127,7 +133,7 @@ services:
     network_mode: "service:gluetun"
     volumes:
       - ../config/transmission:/config
-      - /mnt/media/downloads:/downloads
+      - {{ $downloadsDir }}:/downloads
     environment:
       - PUID=1000
       - PGID=1000

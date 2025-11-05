@@ -1,0 +1,12 @@
+[Unit]
+Description=LibrePods (user)
+
+[Service]
+ExecStart=/usr/bin/librepods
+Restart=on-failure
+RestartSec=3
+WorkingDirectory=%h
+
+[Install]
+WantedBy=default.target
+
